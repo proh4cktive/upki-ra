@@ -1,4 +1,4 @@
-![ProHacktive](https://prohacktive.io/public/images/logo_gray.png "uPKI from ProHacktive.io")
+![ProHacktive](https://prohacktive.io/public/images/logo-prohacktive-grey-dark.svg "uPKI from ProHacktive.io")
 
 # µPKI-RA
 ***NOT READY FOR PRODUCTION USE***
