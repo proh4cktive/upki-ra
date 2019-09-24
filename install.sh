@@ -126,6 +126,13 @@ if [[ -z "$UPKI_URL" ]]; then
     done
 fi
 
+# Extract domain from url
+UPKI_DOMAIN=$(echo "${UPKI_URL}" | cut -d'/' -f3)
+
+# Install required libs
+echo "[+] Install required libs"
+pip3 install -r requirements.txt
+
 # Request CA register SEED value from user if needed
 if [[ -z "$UPKI_SEED" ]]; then
     read -p "Enter register SEED value: " UPKI_SEED
@@ -135,14 +142,8 @@ if [[ -z "$UPKI_SEED" ]]; then
     done
 fi
 
-# Extract domain from url
-UPKI_DOMAIN=$(echo "${UPKI_URL}" | cut -d'/' -f3)
-
-# Install required libs
-echo "[+] Install required libs"
-pip3 install -r requirements.txt
-
 # Launch uPKI registration
+echo "[+] Launching registration against tcp://${UPKI_IP}:${UPKI_PORT} with SEED: ${UPKI_SEED}"
 ./ra_server.py --ip ${UPKI_IP} --port ${UPKI_PORT} register --seed ${UPKI_SEED}
 
 echo "[+] Create services & timers"
