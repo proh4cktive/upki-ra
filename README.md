@@ -21,9 +21,10 @@ The following modules are required
 - PyYAML
 - PyZMQ
 
-A web server (Nginx only by now) is also required
+Some systems libs & tools are also required, make sure you have them pre-installed. A web server (Nginx only by now) is also required
 ```bash
-sudo apt install nginx
+sudo apt update
+sudo apt -y install build-essential libssl-dev libffi-dev python3-dev python3-pip git nginx
 ```
 
 ## 2. Install
@@ -37,12 +38,12 @@ cd ./upki-ra
 
 2. Install the dependencies and upki-ra service in order to auto-start service on boot if needed. The install script will also setup the auto-generation of CRL and guide you during the setup process of your Registration Authority (RA)
 ```bash
-sudo ./install.sh
+./install.sh
 ```
 
 If your CA is running on specific ports you can pass them to install script
 ```bash
-sudo ./install.sh -i 127.0.0.1 -p 5000
+./install.sh -i 127.0.0.1 -p 5000
 ```
 
 If you have more complex configurations, you will probably need to modify the services and timer scripts in: 

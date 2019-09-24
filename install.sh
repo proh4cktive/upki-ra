@@ -46,6 +46,14 @@ function is_url {
     return 1
 }
 
+function is_seed {
+    regex='^([0-9a-fA-F]{32,64})$'
+    if [[ $1 =~ $regex ]]; then
+        return 0
+    fi
+    return 1
+}
+
 echo -e "\t\t..:: µPki Registration Authority Installer ::.."
 echo ""
 
@@ -68,6 +76,7 @@ UPKI_DIR="${HOME}/.upki/"
 UPKI_IP='127.0.0.1'
 UPKI_PORT=5000
 UPKI_URL=''
+UPKI_SEED=''
 UPKI_DOMAIN=''
 
 usage="$(basename "$0") [-h] [-u https://certificates.domain.com] [-d ${UPKI_DIR}] [-i ${UPKI_IP}] [-p ${UPKI_PORT}] -- Install script for uPKI Registration Authority
@@ -75,17 +84,20 @@ usage="$(basename "$0") [-h] [-u https://certificates.domain.com] [-d ${UPKI_DIR
 where:
     -h  show this help text
     -u  set your listening domain that the world will use (https://certificates.domain.com)
+    -s  set the register SEED value
     -d  set the install directory for logs and storage
     -i  set the CA listening IP (default: 127.0.0.1)
     -p  set the CA listening port (default: 5000)
 "
 
-while getopts ':hudip:' option; do
+while getopts ':husdip:' option; do
   case "$option" in
     h) echo "$usage"
        exit
        ;;
     u) UPKI_URL=$OPTARG
+       ;;
+    s) UPKI_SEED=$OPTARG
        ;;
     d) UPKI_DIR=$OPTARG
        ;;
@@ -114,12 +126,24 @@ if [[ -z "$UPKI_URL" ]]; then
     done
 fi
 
+# Request CA register SEED value from user if needed
+if [[ -z "$UPKI_SEED" ]]; then
+    read -p "Enter register SEED value: " UPKI_SEED
+    while ! is_seed "$UPKI_SEED"
+    do
+        read -p "Not a valid SEED. Re-enter: " UPKI_SEED
+    done
+fi
+
 # Extract domain from url
 UPKI_DOMAIN=$(echo "${UPKI_URL}" | cut -d'/' -f3)
 
 # Install required libs
 echo "[+] Install required libs"
 pip3 install -r requirements.txt
+
+# Launch uPKI registration
+./ra_server.py --ip ${UPKI_IP} --port ${UPKI_PORT} register --seed ${UPKI_SEED}
 
 echo "[+] Create services & timers"
 # Create ra service
@@ -179,8 +203,9 @@ EOT
 # Setup website
 if [[ -d "/var/www" ]]; then
     echo "[+] Create website"
-    sudo mkdir -p /var/www/upki
-    sudo cp -rf ./registration/dist/* /var/www/upki/
+    sudo mkdir /var/www/upki
+    sudo chown -R $USERNAME.$GROUPNAME /var/www/upki
+    git clone --quiet https://github.com/proh4cktive/upki-web.git /var/www/upki
 fi
 
 # Create pre-configured VHOST for NGINX
@@ -267,7 +292,7 @@ server {
         add_header Connection "upgrade";
         add_header SSL-Client-Verify $ssl_client_verify;
         add_header SSL-Client-DN $ssl_client_s_dn;
-        root /var/www/upki;
+        root /var/www/upki/dist;
     }
 }
 EOT
