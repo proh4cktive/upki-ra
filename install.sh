@@ -72,7 +72,7 @@ GROUPNAME=$(id -gn $USER)
 INSTALL=${PWD}
 
 # Setup UPKI default vars
-UPKI_DIR="${HOME}/.upki/"
+UPKI_DIR="${HOME}/.upki"
 UPKI_IP='127.0.0.1'
 UPKI_PORT=5000
 UPKI_URL=''
@@ -215,13 +215,18 @@ if [[ ! -d "/var/www/upki" ]]; then
     git clone --quiet https://github.com/proh4cktive/upki-web.git /var/www/upki
 fi
 
+# Setup Nginx config name bucket
+if [[ -f "/etc/nginx/conf.d/upki.conf" ]]; then
+    sudo cat "server_names_hash_bucket_size 64;" > "/etc/nginx/conf.d/upki.conf"
+fi
+
 # Create pre-configured VHOST for NGINX
 if [[ -d "/etc/nginx/sites-available" ]]; then
     sudo tee /etc/nginx/sites-available/upki.conf > /dev/null <<EOT
 server {
     listen 80;
     server_name ${UPKI_DOMAIN};
-    return 301 https://$host$request_uri;
+    return 301 https://\$host\$request_uri;
 }
 
 server {
@@ -232,8 +237,8 @@ server {
     index index.html;
     
     # Redirect non-https traffic to https
-    if ($scheme != "https") {
-        return 301 https://$host$request_uri;
+    if (\$scheme != "https") {
+        return 301 https://\$host\$request_uri;
     }
 
     ssl_protocols TLSv1.1 TLSv1.2;
@@ -260,45 +265,45 @@ server {
     # Public unprotected requests
     location ~ ^/(ocsp|magic|certs|certify)/? {
         proxy_redirect off;
-        proxy_set_header Host $host;
-        proxy_set_header Access-Control-Allow-Origin: $http_origin;
+        proxy_set_header Host \$host;
+        proxy_set_header Access-Control-Allow-Origin: \$http_origin;
         proxy_set_header Access-Control-Allow-Credentials: true;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_pass      http://127.0.0.1:8000;
     }
 
     # Client or Admin restricted requests
-    location ~ ^/(clients/renew|private/)$ {
-        if ($ssl_client_verify != SUCCESS) {
+    location ~ ^/(clients/renew|private/)\$ {
+        if (\$ssl_client_verify != SUCCESS) {
            return 404;
         }   
         proxy_redirect off;
-        proxy_set_header Host $host;
-        proxy_set_header Access-Control-Allow-Origin: $http_origin;
+        proxy_set_header Host \$host;
+        proxy_set_header Access-Control-Allow-Origin: \$http_origin;
         proxy_set_header Access-Control-Allow-Credentials: true;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header SSL-Client-Verify $ssl_client_verify;
-        proxy_set_header SSL-Client-DN $ssl_client_s_dn;
+        proxy_set_header SSL-Client-Verify \$ssl_client_verify;
+        proxy_set_header SSL-Client-DN \$ssl_client_s_dn;
         proxy_pass      http://127.0.0.1:8000;
     }
 
     # RA web interface (administration)
     location / {
-        if ($ssl_client_verify != SUCCESS) {
+        if (\$ssl_client_verify != SUCCESS) {
             return 404;
         }
-        add_header Host $host;
-        add_header Access-Control-Allow-Origin: $http_origin;
+        add_header Host \$host;
+        add_header Access-Control-Allow-Origin: \$http_origin;
         add_header Access-Control-Allow-Credentials: true;
-        add_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        add_header Upgrade $http_upgrade;
+        add_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        add_header Upgrade \$http_upgrade;
         add_header Connection "upgrade";
-        add_header SSL-Client-Verify $ssl_client_verify;
-        add_header SSL-Client-DN $ssl_client_s_dn;
+        add_header SSL-Client-Verify \$ssl_client_verify;
+        add_header SSL-Client-DN \$ssl_client_s_dn;
         root /var/www/upki/dist;
     }
 }
