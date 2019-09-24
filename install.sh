@@ -147,7 +147,7 @@ pip3 install -r requirements.txt
 
 echo "[+] Create services & timers"
 # Create ra service
-sudo cat <<EOT > /etc/systemd/system/upki-ra.service
+sudo tee /etc/systemd/system/upki-ra.service > /dev/null <<EOT
 [Unit]
 Description=µPki Registration Authority service
 ConditionACPower=true
@@ -166,7 +166,7 @@ WantedBy=multi-user.target
 EOT
 
 # Create CRL generation service
-sudo cat <<EOT > /etc/systemd/system/upki-ra-crl.service
+sudo tee /etc/systemd/system/upki-ra-crl.service > /dev/null <<EOT
 [Unit]
 Description=µPki CRL generation service
 ConditionACPower=true
@@ -185,7 +185,7 @@ WantedBy=upki-ra-crl.timer
 EOT
 
 # Create CRL timer (every days @ 2:AM)
-sudo cat <<EOT > /etc/systemd/system/upki-ra-crl.timer
+sudo tee /etc/systemd/system/upki-ra-crl.timer > /dev/null <<EOT
 [Unit]
 Description=µPki CRL generation service timer
 
@@ -210,7 +210,7 @@ fi
 
 # Create pre-configured VHOST for NGINX
 if [[ -d "/etc/nginx/sites-available" ]]; then
-    sudo cat <<EOT > /etc/nginx/sites-available/upki.conf
+    sudo tee /etc/nginx/sites-available/upki.conf > /dev/null <<EOT
 server {
     listen 80;
     server_name ${UPKI_DOMAIN};
