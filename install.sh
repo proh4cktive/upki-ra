@@ -129,6 +129,12 @@ fi
 # Extract domain from url
 UPKI_DOMAIN=$(echo "${UPKI_URL}" | cut -d'/' -f3)
 
+# Update system & install required apps
+echo "[+] Update system"
+sudo apt -y update && sudo apt -y upgrade
+echo "[+] Install required apps"
+sudo apt -y install build-essential python3-dev python3-pip git nginx
+
 # Install required libs
 echo "[+] Install required libs"
 pip3 install -r requirements.txt
@@ -202,9 +208,9 @@ WantedBy=timers.target
 EOT
 
 # Setup website
-if [[ -d "/var/www" ]]; then
+if [[ ! -d "/var/www/upki" ]]; then
     echo "[+] Create website"
-    sudo mkdir /var/www/upki
+    sudo mkdir -p /var/www/upki
     sudo chown -R $USERNAME.$GROUPNAME /var/www/upki
     git clone --quiet https://github.com/proh4cktive/upki-web.git /var/www/upki
 fi
@@ -308,7 +314,7 @@ fi
 # Reload services
 sudo systemctl daemon-reload
 
-echo "Do you wish to activate uPKI-RA on boot?"
+echo "Do you wish to activate uPKI-RA service on boot?"
 select yn in "Yes" "No"; do
     case $yn in
         Yes )
