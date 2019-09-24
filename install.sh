@@ -321,5 +321,5 @@ select yn in "Yes" "No"; do
     esac
 done   
 
-echo "[+] All done, go check https://${UPKI_DOMAIN}"
+echo "[+] All done"
 echo ""
