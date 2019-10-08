@@ -1,5 +1,6 @@
 setuptools==41.2.0
-Flask==1.0.2
+Flask==0.11.1
+validators==0.12.4
 flask_cors==3.0.8
 PyYAML==5.1.2
 pyzmq==18.1.0
