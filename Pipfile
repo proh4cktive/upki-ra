@@ -9,7 +9,7 @@ verify_ssl = true
 zmq = "*"
 requests = "==2.18.4"
 pyzmq = "==18.1.0"
-Flask = "==0.10.1"
+Flask = "==1.0.2"
 Flask-Cors = "==3.0.8"
 PyYAML = "==5.1.2"
 validators = "==0.12.4"
