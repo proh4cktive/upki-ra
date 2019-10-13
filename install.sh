@@ -275,7 +275,7 @@ server {
     }
 
     # Client or Admin restricted requests
-    location ~ ^/(clients/renew|private/)\$ {
+    location ~ ^/(clients/renew|private/)/?\$ {
         if (\$ssl_client_verify != SUCCESS) {
            return 404;
         }   
