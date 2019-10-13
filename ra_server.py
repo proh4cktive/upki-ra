@@ -97,6 +97,10 @@ def main(argv):
         try:
             # Only launch register part
             if server_ra.register(args.seed):
+                logger.info('You should now run:')
+                logger.info('sudo chgrp www-data {p}'.format(p=os.path.join(BASE_DIR, 'certificates.*')), color="WHITE", light=True)
+                logger.info('sudo chmod 640 {p}'.format(p=os.path.join(BASE_DIR, 'certificates.*')), color="WHITE", light=True)
+                logger.info('sudo service nginx restart', color="WHITE", light=True)
                 logger.info('All good !')
         except Exception as err:
             logger.critical('Unable to register RA: {e}'.format(e=err))
