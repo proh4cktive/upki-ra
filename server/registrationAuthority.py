@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import os
+import grp
 import zmq
 import json
 import subprocess
