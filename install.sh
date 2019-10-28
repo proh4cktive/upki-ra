@@ -154,7 +154,7 @@ echo "[+] Launching registration against tcp://${UPKI_IP}:${UPKI_PORT} with SEED
 
 echo "[+] Create services & timers"
 # Create ra service
-sudo tee /etc/systemd/system/upki-ra.service > /dev/null <<EOT
+tee /tmp/upki-ra.service > /dev/null <<EOT
 [Unit]
 Description=µPki Registration Authority service
 ConditionACPower=true
@@ -166,14 +166,15 @@ Type=simple
 User=${USERNAME}
 Group=${GROUPNAME}
 Restart=always
-ExecStart=${INSTALL}/ra_server.py --dir ${UPKI_DIR} --ip ${UPKI_IP} --port ${UPKI_PORT} listen
+WorkingDirectory=${INSTALL}
+ExecStart=/usr/bin/python3 ./ra_server.py --dir ${UPKI_DIR} --ip ${UPKI_IP} --port ${UPKI_PORT} listen
 
 [Install]
 WantedBy=multi-user.target
 EOT
 
 # Create CRL generation service
-sudo tee /etc/systemd/system/upki-ra-crl.service > /dev/null <<EOT
+tee /tmp/upki-ra-crl.service > /dev/null <<EOT
 [Unit]
 Description=µPki CRL generation service
 ConditionACPower=true
@@ -185,14 +186,15 @@ Type=simple
 User=${USERNAME}
 Group=${GROUPNAME}
 Restart=always
-ExecStart=${INSTALL}/ra_server.py --dir ${UPKI_DIR} crl
+WorkingDirectory=${INSTALL}
+ExecStart=/usr/bin/python3 ./ra_server.py --dir ${UPKI_DIR} --ip ${UPKI_IP} --port ${UPKI_PORT} crl
 
 [Install]
 WantedBy=upki-ra-crl.timer
 EOT
 
 # Create CRL timer (every days @ 2:AM)
-sudo tee /etc/systemd/system/upki-ra-crl.timer > /dev/null <<EOT
+tee /tmp/upki-ra-crl.timer > /dev/null <<EOT
 [Unit]
 Description=µPki CRL generation service timer
 
@@ -206,6 +208,11 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 EOT
+
+# Move files if possible
+sudo mv /tmp/upki-ra.service /etc/systemd/system/
+sudo mv /tmp/upki-ra-crl.service /etc/systemd/system/
+sudo mv /tmp/upki-ra-crl.timer /etc/systemd/system/
 
 # Setup website
 if [[ ! -d "/var/www/upki" ]]; then
@@ -222,7 +229,7 @@ fi
 
 # Create pre-configured VHOST for NGINX
 if [[ -d "/etc/nginx/sites-available" ]]; then
-    sudo tee /etc/nginx/sites-available/upki.conf > /dev/null <<EOT
+    tee /tmp/nginx_upki.conf > /dev/null <<EOT
 server {
     listen 80;
     server_name ${UPKI_DOMAIN};
@@ -275,7 +282,7 @@ server {
     }
 
     # Client or Admin restricted requests
-    location ~ ^/(clients/renew|private/)/?\$ {
+    location ~ ^/(clients/renew|private)/? {
         if (\$ssl_client_verify != SUCCESS) {
            return 404;
         }   
@@ -308,6 +315,10 @@ server {
     }
 }
 EOT
+    # Adapt domain in website
+    sed -i "s/certificates.kitchen.io/${UPKI_DOMAIN}/g" /var/www/upki/dist/js/*
+    # Copy file
+    sudo mv /tmp/nginx_upki.conf /etc/nginx/sites-available/upki.conf
     # Enable vhost
     echo "[+] Enable vhost in Nginx"
     sudo ln -s /etc/nginx/sites-available/upki.conf /etc/nginx/sites-enabled/upki
@@ -331,7 +342,11 @@ select yn in "Yes" "No"; do
             break;;
         No ) exit;;
     esac
-done   
+done
+
+# Force first CRL generation
+# echo "[+] Generate first CRL"
+# ${INSTALL}/ra_server.py --dir ${UPKI_DIR} --ip ${UPKI_IP} --port ${UPKI_PORT} crl
 
 echo "[+] All done"
 echo ""
