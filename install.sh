@@ -298,11 +298,16 @@ server {
         proxy_pass      http://127.0.0.1:8000;
     }
 
+    location @rewrites {
+        rewrite ^(.+)$ /index.html last;
+    }
+
     # RA web interface (administration)
     location / {
         if (\$ssl_client_verify != SUCCESS) {
             return 404;
         }
+        try_files $uri $uri/ @rewrites;
         add_header Host \$host;
         add_header Access-Control-Allow-Origin: \$http_origin;
         add_header Access-Control-Allow-Credentials: true;
