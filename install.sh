@@ -165,7 +165,7 @@ Wants=network-online.target
 Type=simple
 User=${USERNAME}
 Group=${GROUPNAME}
-Restart=always
+Restart=on-failure
 WorkingDirectory=${INSTALL}
 ExecStart=/usr/bin/python3 ./ra_server.py --dir ${UPKI_DIR} --ip ${UPKI_IP} --port ${UPKI_PORT} listen
 
@@ -185,9 +185,11 @@ Wants=network-online.target
 Type=simple
 User=${USERNAME}
 Group=${GROUPNAME}
-Restart=always
+Restart=on-failure
 WorkingDirectory=${INSTALL}
 ExecStart=/usr/bin/python3 ./ra_server.py --dir ${UPKI_DIR} --ip ${UPKI_IP} --port ${UPKI_PORT} crl
+ExecStartPost=/usr/sbin/service nginx restart
+# ExecStartPost=/usr/sbin/service apache2 restart
 
 [Install]
 WantedBy=upki-ra-crl.timer
