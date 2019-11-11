@@ -23,7 +23,7 @@ def renew():
         infos = nginx_dn.split(',')
         infos.reverse()
         dn = '/'.join(infos)
-        data = current_app.ra.renew_node('/{d}'.format(d=dn))
+        data = current_app.ra.renew_node('{d}'.format(d=dn))
     except Exception as err:
         return send_error(err)
 
