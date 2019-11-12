@@ -49,7 +49,6 @@ def main(argv):
     parser_listen.add_argument("-i", "--web-ip", help="Define web RA listening IP (default: {i})".format(i=WEB_HOST), default=WEB_HOST)
     parser_listen.add_argument("-p", "--web-port", help="Define web RA listening port (default: {p})".format(p=WEB_PORT), default=WEB_PORT)
 
-    
     args = parser.parse_args()
 
     try:
@@ -60,7 +59,7 @@ def main(argv):
         sys.exit(1)
 
     if args.dir:
-        BASE_DIR = args.dir
+        BASE_DIR = args.dir if args.dir.endswith('/') else "{p}/".format(p=args.dir)
 
     # Ensure directory exists
     if not os.path.isdir(BASE_DIR):
