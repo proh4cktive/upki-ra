@@ -33,17 +33,17 @@ def main(argv):
 
     # Allow subparsers
     subparsers = parser.add_subparsers(title='commands')
-    
+
     parser_init = subparsers.add_parser('init', help="Initialize your RA.")
     parser_init.set_defaults(which='init')
-    
+
     parser_register = subparsers.add_parser('register', help="Enable the 0MQ server in clear-mode. This allow to setup your RA certificates.")
     parser_register.set_defaults(which='register')
     parser_register.add_argument("-s", "--seed", help="Allow RA registration against CA", required=True)
-    
+
     parser_crl = subparsers.add_parser('crl', help="Enable the 0MQ server in clear-mode. This allow to setup your RA certificates.")
     parser_crl.set_defaults(which='crl')
-    
+
     parser_listen = subparsers.add_parser('listen', help="Enable the RA 0MQ server in TLS. This enable interactions by events emitted from RA.")
     parser_listen.set_defaults(which='listen')
     parser_listen.add_argument("-i", "--web-ip", help="Define web RA listening IP (default: {i})".format(i=WEB_HOST), default=WEB_HOST)
@@ -83,14 +83,14 @@ def main(argv):
         CA_HOST = args.ip
     if args.port:
         CA_PORT = args.port
-    
+
     try:
         # Init PKI connection
         logger.debug('Start uPKI Registration Authority')
         server_ra = server.RegistrationAuthority(logger, BASE_DIR, CA_HOST, CA_PORT )
     except Exception as err:
         raise Exception('Unable to initialize RA: {e}'.format(e=err))
-    
+
     # Specific behaviour when seed is set
     if args.which == 'register':
         try:
@@ -106,7 +106,7 @@ def main(argv):
             sys.exit(1)
 
         sys.exit(0)
-    
+
     elif args.which == 'crl':
         try:
             # Generate CRL file
@@ -127,7 +127,7 @@ def main(argv):
         # Start Web app
         app = Flask(__name__)
         # app.secret_key = 'XXXXXXXXXXXXXXXXXXXXXXX'
-        
+
         # Setup CORS
         CORS(app)
 
