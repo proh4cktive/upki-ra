@@ -13,6 +13,7 @@ from flask_cors import CORS
 
 import server
 
+
 def main(argv):
 
     # Define vars
@@ -87,7 +88,7 @@ def main(argv):
     try:
         # Init PKI connection
         logger.debug('Start uPKI Registration Authority')
-        server_ra = server.RegistrationAuthority(logger, BASE_DIR, CA_HOST, CA_PORT )
+        server_ra = server.RegistrationAuthority(logger, BASE_DIR, CA_HOST, CA_PORT)
     except Exception as err:
         raise Exception('Unable to initialize RA: {e}'.format(e=err))
 
@@ -151,13 +152,6 @@ def main(argv):
         except Exception as err:
             logger.critical('Unable to run WEB app: {e}'.format(e=err))
 
-# Standard entry point
-if __name__ == '__main__':
-    try:
-        main(sys.argv)
-    except KeyboardInterrupt:
-        sys.stdout.write('\nBye.\n')
-
 # Gunicorn entry point generator
 def server(*args, **kwargs):
     sys.argv = ['--gunicorn']
@@ -165,3 +159,11 @@ def server(*args, **kwargs):
         sys.argv.append("--" + k)
         sys.argv.append(kwargs[k])
     return main(sys.argv)
+
+
+# Standard entry point
+if __name__ == '__main__':
+    try:
+        main(sys.argv)
+    except KeyboardInterrupt:
+        sys.stdout.write('\nBye.\n')

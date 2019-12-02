@@ -6,6 +6,7 @@ import sys
 import logging
 import logging.handlers
 
+
 class PHKLogger(object):
     """Simple Logging class
     Allow to log to file and syslog server if set
@@ -33,14 +34,14 @@ class PHKLogger(object):
         except IOError:
             sys.stderr.write('[!] Unable to write to log file: {f}\n'.format(f=filename))
             sys.exit(1)
-        
+
         formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         self.logger.setLevel(self.level)
 
         self.verbose = verbose
-    
+
     def _is_string(self, string):
         try:
             return isinstance(string, str)
@@ -78,21 +79,21 @@ class PHKLogger(object):
 
         # Clean message
         message = str(message).rstrip()
-        
+
         # Only log if there is a message (not just a new line)
         if message == "":
             return True
-        
+
         # Autoset level if necessary
         if level is None:
             level = self.level
-        
+
         # Convert string level to logging int
         if self._is_string(level):
             level = level.upper()
             if level == "DEBUG":
                 level = logging.DEBUG
-            elif level in ["INFO","INFOS"]:
+            elif level in ["INFO", "INFOS"]:
                 level = logging.INFO
             elif level == "WARNING":
                 level = logging.WARNING
