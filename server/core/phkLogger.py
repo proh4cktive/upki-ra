@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import errno
 import sys
 import logging
 import logging.handlers
@@ -23,7 +24,7 @@ class PHKLogger(object):
         try:
             os.makedirs(os.path.dirname(filename))
         except OSError as err:
-            if (err.errno != os.errno.EEXIST) or not os.path.isdir(os.path.dirname(filename)):
+            if (err.errno != errno.EEXIST) or not os.path.isdir(os.path.dirname(filename)):
                 raise Exception(err)
             pass
 
