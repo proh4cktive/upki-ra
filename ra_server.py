@@ -71,12 +71,19 @@ def main(argv):
 
     LOG_FILE = os.path.join(BASE_DIR, LOG_FILE)
 
-    # Retrieve all metadata from project
-    with open("__metadata.py", 'rt') as meta_file:
-        metadata = dict(re.findall(r"^__([a-z]+)__ = ['\"]([^'\"]*)['\"]", meta_file.read(), re.M))
+    try:
+        # Generate logger object
+        logger = server.PHKLogger(LOG_FILE, LOG_LEVEL, proc_name="upki_ra", verbose=VERBOSE)
+    except Exception as err:
+        raise Exception('Unable to setup logger: {e}'.format(e=err))
+    
+    # Meta information
+    dirname = os.path.dirname(__file__)
 
-    # Generate logger object
-    logger = server.PHKLogger(LOG_FILE, LOG_LEVEL, proc_name="upki_ra", verbose=VERBOSE)
+    # Retrieve all metadata from project
+    with open(os.path.join(dirname, '__metadata.py'), 'rt') as meta_file:
+        metadata = dict(re.findall(r"^__([a-z]+)__ = ['\"]([^'\"]*)['\"]", meta_file.read(), re.M))
+    
     logger.info("\t\t..:: µPKI Registration Authority ::..", color="WHITE", light=True)
     logger.info("version: {v}".format(v=metadata['version']), color="WHITE")
 
