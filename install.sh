@@ -141,7 +141,7 @@ pip3 install -r requirements.txt
 
 # Request CA register SEED value from user if needed
 if [[ -z "$UPKI_SEED" ]]; then
-    read -p "Enter register SEED value: " UPKI_SEED
+    read -p "Enter register SEED value (value delivered by upki during installation): " UPKI_SEED
     while ! is_seed "$UPKI_SEED"
     do
         read -p "Not a valid SEED. Re-enter: " UPKI_SEED
