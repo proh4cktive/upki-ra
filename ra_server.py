@@ -11,7 +11,8 @@ import datetime
 from flask import Flask
 from flask_cors import CORS
 
-import server
+from server.core import PHKLogger
+from server import RegistrationAuthority
 
 
 def main(argv):
@@ -20,6 +21,7 @@ def main(argv):
     DEBUG = True
     BASE_DIR      = os.path.join(os.path.expanduser("~"), '.upki/')
     LOG_FILE      = ".ra.log"
+    LOG_PATH      = os.path.join(BASE_DIR, LOG_FILE)
     LOG_LEVEL     = logging.INFO
     VERBOSE       = True
     CA_HOST       = '127.0.0.1'
@@ -69,11 +71,11 @@ def main(argv):
         except OSError as err:
             raise Exception(err)
 
-    LOG_FILE = os.path.join(BASE_DIR, LOG_FILE)
+    
 
     try:
         # Generate logger object
-        logger = server.PHKLogger(LOG_FILE, LOG_LEVEL, proc_name="upki_ra", verbose=VERBOSE)
+        logger = PHKLogger(LOG_PATH, LOG_LEVEL, proc_name="upki_ra", verbose=VERBOSE)
     except Exception as err:
         raise Exception('Unable to setup logger: {e}'.format(e=err))
     
@@ -95,7 +97,7 @@ def main(argv):
     try:
         # Init PKI connection
         logger.debug('Start uPKI Registration Authority')
-        server_ra = server.RegistrationAuthority(logger, BASE_DIR, CA_HOST, CA_PORT)
+        server_ra = RegistrationAuthority(logger, BASE_DIR, CA_HOST, CA_PORT)
     except Exception as err:
         raise Exception('Unable to initialize RA: {e}'.format(e=err))
 
