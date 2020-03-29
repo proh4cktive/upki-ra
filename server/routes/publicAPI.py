@@ -4,6 +4,7 @@ import base64
 from flask import jsonify, request, send_file
 from flask import current_app
 from flask import Blueprint
+from flask import Response
 from flask_cors import cross_origin
 
 public_api = Blueprint('public_api', __name__)
