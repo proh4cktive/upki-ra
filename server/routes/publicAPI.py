@@ -21,9 +21,13 @@ def retrieve(node):
     """
     try:
         if node == 'ca.crt':
-            certificate = current_app.ra.get_ca()
+            ca = current_app.ra.get_ca()
+            # CA certificate should be accessible directly
+            return Response(ca, mimetype='application/x-x509-ca-cert')
         elif node == 'crl.pem':
-            certificate = current_app.ra.get_crl()
+            crl = current_app.ra.get_crl()
+            # CRL should be accessible directly
+            return Response(crl, mimetype='application/pkix-crl')
         else:
             try:
                 dn = base64.b64decode(node).decode("utf-8")
