@@ -4,6 +4,7 @@ import os
 import grp
 import zmq
 import json
+import hashlib
 import subprocess
 
 import server
@@ -28,9 +29,22 @@ class RegistrationAuthority(server.utils.Tools):
         try:
             # First get CA certificate
             ca_pem = self.get_ca()
-            with open(os.path.join(self._path, 'ca.crt'), 'wt') as raw:
-                raw.write(ca_pem)
-            self.output('CA certificate stored in {p}ca.crt'.format(p=self._path))
+            ca_path = os.path.join(self._path, 'ca.crt')
+            # If file exists check it has not changed
+            if os.path.isfile(ca_path):
+                received = hashlib.sha256(ca_pem.encode('utf-8')).hexdigest()
+                with open(ca_path, 'rt') as f:
+                    raw = f.read()
+                found = hashlib.sha256(raw.encode('utf-8')).hexdigest()
+                if found != received:
+                    raise Exception('CA certificate has changed!!')
+                else:
+                    # We should check validity here...
+                    self.output('CA certificate is valid')
+            else:
+                with open(ca_path, 'wt') as raw:
+                    raw.write(ca_pem)
+                self.output('CA certificate stored in {p}'.format(p=ca_path))
         except Exception as err:
             raise Exception('Unable to retrieve CA certificate: {e}'.format(e=err))
 
