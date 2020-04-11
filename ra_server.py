@@ -19,7 +19,7 @@ def main(argv):
 
     # Define vars
     DEBUG = True
-    BASE_DIR      = os.path.join(os.path.expanduser("~"), '.upki/')
+    BASE_DIR      = os.path.join(os.path.expanduser("~"), '.upki', 'ra/')
     LOG_FILE      = ".ra.log"
     LOG_PATH      = os.path.join(BASE_DIR, LOG_FILE)
     LOG_LEVEL     = logging.INFO

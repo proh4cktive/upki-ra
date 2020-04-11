@@ -32,6 +32,43 @@ def list_nodes():
 
     return jsonify({'status': 'success', 'nodes': data})
 
+@private_api.route('/admins', methods=['GET'])
+def list_admins():
+    try:
+        data = current_app.ra.list_admins()
+    except Exception as err:
+        return send_error(err)
+
+    return jsonify({'status': 'success', 'admins': data})
+
+@private_api.route('/admins', methods=['POST'])
+def add_admin():
+    data = request.get_json()
+    if not isinstance(data, list):
+        return send_error('Incorrect parameter type sent')
+
+    for dn in data:
+        try:
+            current_app.ra.add_admin(dn)
+        except Exception as err:
+            return send_error(err)
+
+    return jsonify({'status': 'success', 'message': 'Admins created'})
+
+@private_api.route('/admins/<dn>',methods=['DELETE'])
+def remove_admin(dn):
+    data = request.get_json()
+    try:
+        admin_dn = base64.b64decode(dn).decode("utf-8")
+    except Exception as err:
+        return send_error(err)
+    try:
+        current_app.ra.remove_admin(admin_dn)
+    except Exception as err:
+        return send_error(err)
+
+    return jsonify({'status': 'success', 'message': 'Admin deleted'})
+
 @private_api.route('/nodes', methods=['POST'])
 def register_nodes():
     data = request.get_json()

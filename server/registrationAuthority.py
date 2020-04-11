@@ -214,6 +214,30 @@ class RegistrationAuthority(server.utils.Tools):
 
         return results
 
+    def list_admins(self):
+        try:
+            data = self._send('list_admins')
+        except Exception as err:
+            raise Exception(err)
+
+        return data
+
+    def add_admin(self, dn):
+        try:
+            result = self._send('add_admin', params=dn)
+        except Exception as err:
+            raise Exception(err)
+
+        return result
+
+    def remove_admin(self, dn):
+        try:
+            result = self._send('remove_admin', params=dn)
+        except Exception as err:
+            raise Exception(err)
+
+        return result
+
     def list_profiles(self):
         try:
             data = self._send('list_profiles')
