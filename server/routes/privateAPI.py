@@ -88,8 +88,8 @@ def remove_admin(dn):
         return send_error(err)
 
     # Update allowed admins
-    if dn in upki_auth.groups:
-        upki_auth.groups.remove(dn)
+    if admin_dn in upki_auth.groups:
+        upki_auth.groups.remove(admin_dn)
 
     return jsonify({'status': 'success', 'message': 'Admin deleted'})
 
