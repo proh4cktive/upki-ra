@@ -5,12 +5,21 @@ from flask import jsonify, request
 from flask import current_app
 from flask import Blueprint
 
-client_api = Blueprint('client_api', __name__)
+from server.utils import TLSAuth
 
 def send_error(msg):
     """Send back error in json
     """
     return jsonify({'status': 'error', 'message': str(msg)})
+
+upki_auth = TLSAuth()
+client_api = Blueprint('client_api', __name__)
+
+@client_api.before_request
+@upki_auth.tls_protected
+def before_request():
+    """ Protect all the client endpoints """
+    pass
 
 @client_api.route('/renew', methods=['GET'])
 def renew():

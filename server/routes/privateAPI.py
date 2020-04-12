@@ -5,14 +5,31 @@ from flask import jsonify, request
 from flask import current_app
 from flask import Blueprint
 
-# from flask_login import login_required, current_user
-
-private_api = Blueprint('private_api', __name__)
+from server.utils import TLSAuth
 
 def send_error(msg):
     """Send back error in json
     """
     return jsonify({'status': 'error', 'message': str(msg)})
+
+upki_auth = TLSAuth()
+private_api = Blueprint('private_api', __name__)
+
+@private_api.before_request
+def chek_admins():
+    # Only need to run once
+    if not len(upki_auth.groups):
+        data = current_app.ra.list_admins()
+        for adm in data:
+            dn = adm.get('dn', None)
+            if dn and (dn not in upki_auth.groups):
+                upki_auth.groups.append(dn)
+    return check_path()
+
+@upki_auth.tls_private
+def check_path():
+    """ Protect all the private endpoints """
+    pass
 
 @private_api.route('/options', methods=['GET'])
 def all_options():
@@ -52,6 +69,9 @@ def add_admin():
             current_app.ra.add_admin(dn)
         except Exception as err:
             return send_error(err)
+        # Update allowed admins
+        if dn not in upki_auth.groups:
+            upki_auth.groups.append(dn)
 
     return jsonify({'status': 'success', 'message': 'Admins created'})
 
@@ -66,6 +86,10 @@ def remove_admin(dn):
         current_app.ra.remove_admin(admin_dn)
     except Exception as err:
         return send_error(err)
+
+    # Update allowed admins
+    if dn in upki_auth.groups:
+        upki_auth.groups.remove(dn)
 
     return jsonify({'status': 'success', 'message': 'Admin deleted'})
 
