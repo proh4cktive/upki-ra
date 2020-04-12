@@ -26,7 +26,7 @@ def chek_admins():
                 upki_auth.groups.append(dn)
     return check_path()
 
-@upki_auth.tls_private
+@upki_auth.tls_private()
 def check_path():
     """ Protect all the private endpoints """
     pass

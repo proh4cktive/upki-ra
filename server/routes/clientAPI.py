@@ -16,7 +16,7 @@ upki_auth = TLSAuth()
 client_api = Blueprint('client_api', __name__)
 
 @client_api.before_request
-@upki_auth.tls_protected
+@upki_auth.tls_protected()
 def before_request():
     """ Protect all the client endpoints """
     pass
