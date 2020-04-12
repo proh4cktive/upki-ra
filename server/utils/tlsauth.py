@@ -5,6 +5,7 @@ from flask import request, Response
 class TLSAuth(object):
     """Global class for TLS client access management
     works with flask request headers
+    Ideas from https://github.com/stef/flask-tlsauth
     """
     def __init__(self, groups=[], verify='SSL-Client-Verify', dn='SSL-Client-DN'):
         """Build the global class parameters
@@ -36,6 +37,12 @@ class TLSAuth(object):
             def tls_wrapper(*args, **kwargs):
                 verified = request.headers.get(self.__header_verify, False)
                 dn = request.headers.get(self.__header_dn, None)
+                # Add support for nginx version newer than 1.11.6
+                # Compliance with RFC 2253 (RFC 4514) format
+                if dn and not dn.startswith('/'):
+                    infos = dn.split(',')
+                    infos.reverse()
+                    dn = '/{i}'.format(i='/'.join(infos))
                 # If client is verified and dn in authorized groups
                 if verified and dn and (dn in groups):
                     return func(*args, **kwargs)
