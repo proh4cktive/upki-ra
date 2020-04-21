@@ -250,7 +250,7 @@ server {
         return 301 https://\$host\$request_uri;
     }
 
-    ssl_protocols TLSv1.2;
+    ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
     ssl_certificate ${UPKI_DIR}/certificates.crt;
     ssl_certificate_key ${UPKI_DIR}/certificates.key;
@@ -259,7 +259,7 @@ server {
     ssl_crl ${UPKI_DIR}/crl.pem;
     ssl_verify_client optional;
 
-    ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+    ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-ECDSA-AES256-GCM-SHA384 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-ECDSA-CHACHA20-POLY1305 ECDHE-RSA-CHACHA20-POLY1305 DHE-RSA-AES128-GCM-SHA256 DHE-RSA-AES256-GCM-SHA384";
 
     access_log /var/log/nginx/upki.access.log;
     error_log /var/log/nginx/upki.error.log;
