@@ -79,8 +79,8 @@ def certify():
         result['certificate']
         result['profile']
         result['dn']
-    except KeyError:
-        return send_error(err)
+    except KeyError as err:
+        return send_error('Missing mandatory param')
 
     return jsonify({'status': 'success', 'certificate': result['certificate'], 'dn': result['dn'], 'profile': result['profile']})
 
