@@ -28,11 +28,12 @@ def renew():
     """
     try:
         nginx_dn = request.headers['SSL-Client-DN']
-        # Nginx build DN using ',' and in reverse order
-        infos = nginx_dn.split(',')
-        infos.reverse()
-        dn = '/'.join(infos)
-        data = current_app.ra.renew_node('{d}'.format(d=dn))
+        # Handle new Nginx version: build DN using ',' and in reverse order
+        if nginx_dn and not nginx_dn.startswith('/'):
+            infos = nginx_dn.split(',')
+            infos.reverse()
+            dn = '/{i}'.format(i='/'.join(infos))
+        data = current_app.ra.renew_node(dn)
     except Exception as err:
         return send_error(err)
 
