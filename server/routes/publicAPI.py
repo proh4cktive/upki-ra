@@ -41,6 +41,7 @@ def retrieve(node):
     return jsonify({'status': 'success', 'certificate': certificate})
 
 @public_api.route('/ocsp', methods=['POST'])
+@cross_origin()
 def ocsp():
     """Online Certificate Status Protocol endpoint
     """
