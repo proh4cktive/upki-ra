@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from flask import request, Response
+from flask import request
+from flask import Response
 
 class TLSAuth(object):
     """Global class for TLS client access management
