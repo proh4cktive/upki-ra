@@ -27,10 +27,10 @@ def renew():
     Client identity is get using TLS client certificate DN value
     """
     try:
-        nginx_dn = request.headers['SSL-Client-DN']
+        dn = request.headers['SSL-Client-DN']
         # Handle new Nginx version: build DN using ',' and in reverse order
-        if nginx_dn and not nginx_dn.startswith('/'):
-            infos = nginx_dn.split(',')
+        if dn and not dn.startswith('/'):
+            infos = dn.split(',')
             infos.reverse()
             dn = '/{i}'.format(i='/'.join(infos))
         data = current_app.ra.renew_node(dn)
