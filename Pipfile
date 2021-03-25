@@ -11,7 +11,7 @@ requests = "~=2.22.0"
 pyzmq = "~=18.1.0"
 Flask = "~=1.1.1"
 Flask-Cors = "~=3.0.8"
-PyYAML = "~=5.1.2"
+PyYAML = "~=5.4"
 validators = "~=0.14.0"
 
 [requires]
